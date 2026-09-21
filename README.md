@@ -6,7 +6,7 @@
 
 [![Power BI](https://img.shields.io/badge/Power_BI-Desktop_Report-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
 [![DAX](https://img.shields.io/badge/DAX-Data_Analysis_Expressions-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/dax/)
-[![Data Model](https://img.shields.io/badge/Data_Model-Star_Schema-7928CA?style=for-the-badge&logo=databricks&logoColor=white)](#-data-model--star-schema-architecture)
+[![Data Model](https://img.shields.io/badge/Data_Model-Star_Schema-7928CA?style=for-the-badge&logo=databricks&logoColor=white)](#-data-model--entity-relationship-architecture)
 [![Python](https://img.shields.io/badge/Python-Data_ETL_%26_Viz-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Author](https://img.shields.io/badge/Created_By-Sujal_Panchal-9333ea?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sujalpanchal-25)
@@ -17,9 +17,10 @@
 
 <br/>
 
-**[📊 Live Screenshots](#-dashboard--report-gallery)** •
-**[🧠 Key Insights](#-executive-summary--market-findings)** •
-**[🏗️ Architecture](#-data-model--star-schema-architecture)** •
+**[📁 Folder Structure](#-project-directory--folder-structure)** •
+**[📸 Dashboard Gallery](#-dashboard--report-gallery)** •
+**[🏗️ Data Modeling & Relations](#-data-model--entity-relationship-architecture)** •
+**[🧠 Market Insights](#-executive-summary--market-findings)** •
 **[📐 DAX Measures](#-dax-measures--analytical-formulas)** •
 **[🚀 Setup Guide](#-quick-start--setup-guide)**
 
@@ -44,6 +45,44 @@ Through an intuitive, cyber-purple glassmorphic interface, CareerLens deciphers 
 | **10 Positions** | **$93,400 / yr** | **$102,500 / yr** | **$132,000 / yr** | **59% Remote** | **Python (90%)** |
 
 </div>
+
+---
+
+## 📁 Project Directory & Folder Structure
+
+The repository is modularly structured to maintain strict separation of concerns between raw transactional data sources, compiled visual presentation assets, and the central Power BI report model:
+
+```plaintext
+CareerLens/
+│
+├── 📂 Dataset/                                    # 📊 Raw Dimension & Fact CSV Sources
+│   ├── 📄 Companies.csv                          # Metadata on hiring firms (size, industry, ratings)
+│   ├── 📄 Jobs.csv                               # Transactional job openings, comp, dates & remote ratio
+│   ├── 📄 Job_Skills.csv                         # Associative M:N bridge mapping Job IDs to Skill IDs
+│   ├── 📄 Locations.csv                          # Geographic hierarchy (City, Country, Region)
+│   └── 📄 Skills.csv                             # Master dictionary of recognized technical competencies
+│
+├── 📂 assets/                                     # 🎨 High-Resolution Visual Presentation Assets
+│   ├── 🖼️ banner.png                             # Official CareerLens presentation & hero banner
+│   ├── 🖼️ overview_dashboard.png                 # Page 1: Executive Overview Dashboard UI
+│   ├── 🖼️ location_insights.png                  # Page 2: Global Compensation & Location Report UI
+│   ├── 🖼️ company_role_insights.png              # Page 3: Employer Profiles & Role Insights UI
+│   ├── 🖼️ skills_hiring_insights.png             # Page 4: Technical Skills & Demand Analytics UI
+│   └── 🖼️ data_model_diagram.png                 # Power BI Model View: Entity Relationships & Star Schema
+│
+├── 📊 Job_Market_Dashboard.pbix                   # 🚀 Core Power BI Desktop File (Data Model, DAX & Visuals)
+├── 📜 LICENSE                                     # Open-source MIT License
+└── 📄 README.md                                   # Comprehensive Project Documentation & Visual Guide
+```
+
+### 🗃️ Component Breakdown
+
+| Folder / File | Type | Purpose & Details |
+| :--- | :--- | :--- |
+| **`Dataset/`** | Data Layer | Stores normalized CSV files acting as the single source of truth (SSOT) ingested via Power Query. |
+| **`assets/`** | Presentation | Contains high-definition screenshots, UI banners, and architectural diagrams rendered for GitHub showcase. |
+| **`Job_Market_Dashboard.pbix`** | BI Application | The production Microsoft Power BI file comprising the data model, DAX engine, theme tokens, and interactive canvas. |
+| **`README.md`** | Documentation | Production-ready documentation covering data architecture, metrics, findings, and usage instructions. |
 
 ---
 
@@ -122,73 +161,103 @@ The Power BI report contains **4 distinct analytical pages** equipped with dynam
 
 ---
 
-## 🏗️ Data Model & Star Schema Architecture
+## 🏗️ Data Model & Entity Relationship Architecture
 
-CareerLens is built on an enterprise-ready **Star Schema** dimensional model, engineered to eliminate redundancy, maximize DAX processing efficiency, and empower fluid cross-filtering across tables.
+CareerLens is architected on an enterprise-grade **Star Schema** dimensional model. In transactional enterprise systems, relationships between jobs and required technical skills represent a classic **Many-to-Many ($M:N$)** scenario. To ensure high VertiPaq engine compression, prevent ambiguous filter propagation, and maximize DAX performance, CareerLens uses an **associative bridge table (`Fact_Job_Skills`)**.
+
+### 🌟 Power BI Model View Diagram
+> *Exact entity-relationship diagram and table layout inside Microsoft Power BI Desktop's Model View:*
+
+<div align="center">
+  <img src="assets/data_model_diagram.png" alt="CareerLens Data Model & Entity Relationship Diagram" width="100%" style="border-radius: 12px; border: 1.5px solid #4c1d95; box-shadow: 0 10px 30px rgba(76, 29, 149, 0.4);"/>
+</div>
+
+---
+
+### 📐 Entity-Relationship (ER) Schema Specification
 
 ```mermaid
 erDiagram
-    DIM_COMPANIES ||--o{ FACT_JOBS : "employs (1:N)"
-    DIM_LOCATIONS ||--o{ FACT_JOBS : "located_at (1:N)"
-    DIM_DATE ||--o{ FACT_JOBS : "posted_on (1:N)"
-    FACT_JOBS ||--o{ FACT_JOB_SKILLS : "requires (1:N)"
-    DIM_SKILLS ||--o{ FACT_JOB_SKILLS : "defines (1:N)"
+    DIM_COMPANIES ||--o{ FACT_JOBS : "1 : N (Filters Fact)"
+    DIM_LOCATIONS ||--o{ FACT_JOBS : "1 : N (Filters Fact)"
+    DIM_DATE ||--o{ FACT_JOBS : "1 : N (Temporal Filter)"
+    FACT_JOBS ||--o{ FACT_JOB_SKILLS : "1 : N (Job Details)"
+    DIM_SKILLS ||--o{ FACT_JOB_SKILLS : "1 : N (Skill Catalog)"
 
     DIM_COMPANIES {
-        string Company_ID PK
-        string Company_Name
-        string Company_Size
-        string Industry
-        float Rating
+        string Company_ID PK "Unique Company Identifier"
+        string Company_Name "Enterprise Name"
+        string Company_Size "Small, Medium, Large"
+        string Industry "AI Research, EdTech, Hardware"
+        float Rating "Company Glassdoor / Review Rating"
     }
 
     DIM_LOCATIONS {
-        string Location_ID PK
-        string City
-        string Country
-        string Region
-    }
-
-    DIM_SKILLS {
-        string Skill_ID PK
-        string Skill_Name
-    }
-
-    FACT_JOBS {
-        string Job_ID PK
-        string Job_Title
-        string Experience_Level
-        string Employment_Type
-        int Remote_Ratio
-        decimal Salary_USD
-        date Posted_Date
-        string Company_ID FK
-        string Location_ID FK
-    }
-
-    FACT_JOB_SKILLS {
-        string Job_ID FK
-        string Skill_ID FK
+        string Location_ID PK "Unique Location Identifier"
+        string City "City Location"
+        string Country "Country"
+        string Region "Continent / Territory"
     }
 
     DIM_DATE {
-        date Date PK
-        string MonthName
-        string YearMonth
-        int Year
+        date Date PK "Calendar Date Key"
+        int Year "Posting Year"
+        string MonthName "Month Name (e.g. August)"
+        string YearMonth "Formatted Year-Month Period"
+        string Quarter "Fiscal Quarter"
+    }
+
+    FACT_JOBS {
+        string Job_ID PK "Unique Job Opening Identifier"
+        string Company_ID FK "References Dim_Companies"
+        string Location_ID FK "References Dim_Locations"
+        date Posted_Date FK "References Dim_Date"
+        string Job_Title "Role Title"
+        string Experience_Level "Entry, Mid, Senior"
+        string Employment_Type "Full-time, Contract, Internship"
+        int Remote_Ratio "Workplace Flexibility (0-100%)"
+        decimal Salary_USD "Annual Base Compensation ($USD)"
+    }
+
+    FACT_JOB_SKILLS {
+        string Job_ID FK "References Fact_Jobs (Compound Key)"
+        string Skill_ID FK "References Dim_Skills (Compound Key)"
+    }
+
+    DIM_SKILLS {
+        string Skill_ID PK "Unique Skill Identifier"
+        string Skill_Name "Technical Proficiency / Tool"
     }
 ```
+
+---
+
+### 🔗 Relationship Cardinality & Filter Flow Matrix
+
+| From Table (Parent / Dim) | To Table (Child / Fact) | Primary Key (PK) | Foreign Key (FK) | Cardinality | Cross-Filter Direction | Architectural Role |
+| :--- | :--- | :--- | :--- | :---: | :---: | :--- |
+| **`Dim_Companies`** | **`Fact_Jobs`** | `Company_ID` | `Company_ID` | **`1 : N`** (One-to-Many) | Single (`Dim ➔ Fact`) | Filters employment facts by company metadata, industry & rating. |
+| **`Dim_Locations`** | **`Fact_Jobs`** | `Location_ID` | `Location_ID` | **`1 : N`** (One-to-Many) | Single (`Dim ➔ Fact`) | Propagates geographic filters across cities, countries & continental regions. |
+| **`Dim_Date`** | **`Fact_Jobs`** | `Date` | `Posted_Date` | **`1 : N`** (One-to-Many) | Single (`Dim ➔ Fact`) | Enables time-intelligence calculations, quarterly trends & month slicers. |
+| **`Fact_Jobs`** | **`Fact_Job_Skills`**| `Job_ID` | `Job_ID` | **`1 : N`** (One-to-Many) | Single (`Fact ➔ Bridge`)| Decomposes job postings into individual skill requirements. |
+| **`Dim_Skills`** | **`Fact_Job_Skills`**| `Skill_ID` | `Skill_ID` | **`1 : N`** (One-to-Many) | Single (`Dim ➔ Bridge`)| Filters skill demand facts by standardized skill naming conventions. |
+
+> [!NOTE]
+> **Why an Associative Bridge Table?**
+> A single job requires multiple skills, and a single skill is required by many jobs ($M:N$). Rather than utilizing a messy bi-directional relationship or un-normalized delimited strings, `Fact_Job_Skills` bridges the two dimensions into clean `1:N` relationships, maintaining optimal DAX query speeds and preventing circular dependency deadlocks.
+
+---
 
 ### 📋 Data Dictionary
 
 | Table Name | Entity Type | Primary / Foreign Key | Description |
 | :--- | :--- | :--- | :--- |
-| **`Fact_Jobs`** | Fact Table | `Job_ID` (PK), `Company_ID` (FK), `Location_ID` (FK) | Core transactional table containing salary, experience level, remote ratio, and post dates. |
-| **`Dim_Companies`** | Dimension Table | `Company_ID` (PK) | Corporate metadata including name, industry segment, enterprise size, and employee rating. |
-| **`Dim_Locations`** | Dimension Table | `Location_ID` (PK) | Geographic hierarchy encompassing City, Country, and continental Region. |
-| **`Dim_Skills`** | Dimension Table | `Skill_ID` (PK) | Catalog of recognized technical proficiencies (Python, TensorFlow, PyTorch, SQL, etc.). |
-| **`Fact_Job_Skills`** | Bridge / Associative | `Job_ID` (FK), `Skill_ID` (FK) | Resolves the many-to-many relationship between Job roles and required Skill tags. |
-| **`Dim_Date`** | Dimension Table | `Date` (PK) | Temporal dimension facilitating time-intelligence analysis across months and quarters. |
+| **`Fact_Jobs`** | Fact Table | `Job_ID` (PK), `Company_ID` (FK), `Location_ID` (FK), `Posted_Date` (FK) | Core transactional fact table containing salary, experience level, remote ratio, and post dates. |
+| **`Dim_Companies`** | Dimension Table | `Company_ID` (PK) | Corporate dimension table including firm name, industry segment, enterprise size, and employee rating. |
+| **`Dim_Locations`** | Dimension Table | `Location_ID` (PK) | Geographic dimension table encompassing City, Country, and continental Region hierarchies. |
+| **`Dim_Skills`** | Dimension Table | `Skill_ID` (PK) | Catalog dimension of recognized technical proficiencies (Python, TensorFlow, PyTorch, SQL, Cloud, etc.). |
+| **`Fact_Job_Skills`** | Bridge / Fact | `Job_ID` (FK), `Skill_ID` (FK) | Resolves the many-to-many relationship between Job openings and required Skill tags. |
+| **`Dim_Date`** | Dimension Table | `Date` (PK) | Temporal dimension facilitating time-intelligence analysis across months, quarters, and years. |
 
 ---
 
@@ -294,30 +363,6 @@ The aggregate remote work ratio sits at <b>59%</b>:
 - **Berlin, Germany & London, UK**: European tech hubs offer competitive salaries ranging from <code>$89,000</code> to <code>$107,000</code>.
 - **Bengaluru, India**: Emerging AI talent hub averaging <code>$51,000</code>, offering significant cost-efficiency for early-stage AI research.
 </details>
-
----
-
-## 🗂️ Project Repository Structure
-
-```plaintext
-CareerLens/
-├── 📁 Dataset/
-│   ├── Companies.csv              # Company profiles, ratings, industry & size
-│   ├── Jobs.csv                   # Job openings, salary, dates & remote ratio
-│   ├── Job_Skills.csv             # Relational bridge mapping jobs to skills
-│   ├── Locations.csv              # Geographic hierarchy (City, Country, Region)
-│   └── Skills.csv                 # Master skill taxonomy
-│
-├── 📁 assets/
-│   ├── banner.png                 # Project hero presentation banner
-│   ├── overview_dashboard.png     # Page 1: Overview Dashboard screenshot
-│   ├── location_insights.png      # Page 2: Location Insights report screenshot
-│   ├── company_role_insights.png  # Page 3: Company & Role Insights screenshot
-│   └── skills_hiring_insights.png # Page 4: Skill & Hiring Insights screenshot
-│
-├── 📊 Job_Market_Dashboard.pbix    # Microsoft Power BI complete project file
-└── 📄 README.md                   # Project documentation & visual guide
-```
 
 ---
 
